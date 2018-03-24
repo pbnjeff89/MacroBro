@@ -30,6 +30,18 @@ class IngredientToRecipe(db.Model):
 	recipe = db.relationship('Recipe', back_populates='ingredients')
 	ingredient = db.relationship('Ingredient', back_populates='recipes')
 	
+	
+	def get_protein_scaled(self):
+		return self.ingredient.protein * self.ingredient_amt / 100
+		
+		
+	def get_fat_scaled(self):
+		return self.ingredient.fat * self.ingredient_amt / 100
+		
+		
+	def get_carbohydrates_scaled(self):
+		return self.ingredient.carbohydrates * self.ingredient_amt / 100
+	
 		
 class Recipe(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
