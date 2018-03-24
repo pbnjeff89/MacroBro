@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1> User: {{ user.username }} </h1>
+	<hr>
+	{% for recipe in recipes %}
+	<p>
+	{{ recipe.user.username }} has a recipe called: <b>{{ recipe.body }}</b>. It has:
+	</p>
+	<ul>
+	{% for assoc in recipe.ingredients %}
+		<li>{{ assoc.ingredient_amt }} g of {{ assoc.ingredient.description }}</li>
+	{% endfor %}
+	</ul>
+	<p>
+	For a total of {{ recipe.get_macro_totals()[0] }} g of protein, {{ recipe.get_macro_totals()[1] }} g of fats, and
+	{{ recipe.get_macro_totals()[2] }} g of carbohydrates.
+	</p>
+	{% endfor %}
+{% endblock %}
