@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1>Edit recipe</h1>
+	<form action="" method="post">
+		{{ form.hidden_tag() }}
+		<p>
+		{{ form.recipes.label }}
+		{{ form.recipes }}
+		</p>
+		<p>
+		{{ form.submit_select_recipe() }}
+		</p>
+		{% if recipe %}
+			<h2>Ingredients</h2>
+			<ul>
+			{% for ingredient in recipe.ingredients %}
+				<li>{{ ingredient.ingredient_amt }} g of {{ ingredient.ingredient.description }}</li>
+			{% endfor %}
+			</ul>
+		{% endif %}
+		<p>
+		{{ form.submit_confirm() }}
+		{{ form.submit_cancel() }}
+		{{ form.submit_delete() }}
+		</p>
+	</form>
+{% endblock %}
