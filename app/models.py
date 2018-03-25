@@ -50,7 +50,7 @@ class Recipe(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 	ingredients = db.relationship('IngredientToRecipe', back_populates='recipe')
 	
-	
+
 	def get_macro_totals(self):
 		protein_total = fat_total = carbohydrates_total = 0
 		

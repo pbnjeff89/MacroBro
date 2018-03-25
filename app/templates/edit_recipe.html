@@ -5,37 +5,15 @@
 	<form action="" method="post">
 		{{ form.hidden_tag() }}
 		<p>
-		{{ form.recipes.label }}
-		{{ form.recipes }}
+			{{ form.recipes.label }}
+			{{ form.recipes }}
+			{% for error in form.recipes.errors %}
+				<span style="color: red;"> [{{ error }}]</span>
+			{% endfor %}
 		</p>
-		<p>
+		</p>
 		{{ form.submit_select_recipe() }}
-		</p>
-		{% if recipe %}
-			<h2>Ingredients</h2>
-			<table>
-				<tr>
-					<th>Ingredient</th>
-					<th>Amount in Recipe (g)</th>
-					<th>Protein (g)</th>
-					<th>Fat (g)</th>
-					<th>Carbohydrates (g)</th>
-				</tr>
-				{% for ingredient in recipe.ingredients %}
-					<tr>
-						<td>{{ ingredient.ingredient.description }}</td>
-						<td>{{ ingredient.ingredient_amt }}</td>
-						<td>{{ ingredient.get_protein_scaled() }}</td>
-						<td>{{ ingredient.get_fat_scaled() }}</td>
-						<td>{{ ingredient.get_carbohydrates_scaled() }}</td>
-					</tr>
-				{% endfor %}
-			</table>
-		{% endif %}
-		<p>
-		{{ form.submit_confirm() }}
-		{{ form.submit_cancel() }}
-		{{ form.submit_delete() }}
+		{{ form.submit_delete_recipe() }}
 		</p>
 	</form>
 {% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1>Edit ingredients</h1>
+	<form action="" method="post">
+		{{ form.hidden_tag() }}
+			<h2>Ingredients</h2>
+			<table>
+				<tr>
+					<th>Ingredient</th>
+					<th>Amount in Recipe (g)</th>
+					<th>Protein (g)</th>
+					<th>Fat (g)</th>
+					<th>Carbohydrates (g)</th>
+				</tr>
+				{% for ingredient in recipe.ingredients %}
+					<tr>
+						<td>{{ ingredient.ingredient.description }}</td>
+						<td>{{ ingredient.ingredient_amt }}</td>
+						<td>{{ ingredient.get_protein_scaled() }}</td>
+						<td>{{ ingredient.get_fat_scaled() }}</td>
+						<td>{{ ingredient.get_carbohydrates_scaled() }}</td>
+					</tr>
+				{% endfor %}
+			</table>
+		<p>
+		{{ form.ingredients }}
+		{{ form.new_amount.label }}
+		{{ form.new_amount }}
+		{{ form.submit_change_amount() }}
+		{{ form.submit_delete_ingredient() }}
+		</p>
+		<p>
+		{% for error in form.new_amount.errors %}
+			<span style="color: red;">[{{ error }}]</span>
+		{% endfor %}
+		</p>
+	</form>
+{% endblock %}

@@ -1,8 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, RecipeForm, RecipeEditForm
+from app.forms import LoginForm, RegistrationForm, RecipeForm, RecipeEditForm, IngredientEditForm, IngredientSearchForm
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, Recipe
+from app.models import User, Recipe, Ingredient, IngredientToRecipe
 from werkzeug.urls import url_parse
 
 @app.route('/')
@@ -85,7 +85,6 @@ def new_recipe():
 	return render_template('new_recipe.html',
 						recipe_form=recipe_form)
 						
-						
 @app.route('/edit_recipe', methods=['GET','POST'])
 @login_required
 def edit_recipe():
@@ -95,13 +94,41 @@ def edit_recipe():
 	recipe_edit_form = RecipeEditForm()
 	recipe_edit_form.recipes.choices = recipe_choices
 	
-	selected_recipe = None
-	
-	if recipe_edit_form.submit_select_recipe.data:
-		selected_recipe_id = recipe_edit_form.recipes.data
-		selected_recipe = Recipe.query.get(selected_recipe_id)
-	
+	if recipe_edit_form.validate_on_submit():
+		recipe_id = recipe_edit_form.recipes.data
+		if recipe_edit_form.submit_select_recipe.data:
+			return redirect(url_for('edit_recipe_ingredients',
+											recipe_id=recipe_id))
+		if recipe_edit_form.submit_delete_recipe.data:
+			selected_recipe = Recipe.query.get(recipe_id)
+			db.session.delete(selected_recipe)
+			db.session.commit()
+
 	return render_template('edit_recipe.html',
-						form=recipe_edit_form,
-						recipe=selected_recipe)
+						form=recipe_edit_form)
+						
+@app.route('/edit_recipe_ingredients/<recipe_id>', methods=['GET','POST'])
+@login_required
+def edit_recipe_ingredients(recipe_id):
+	recipe = Recipe.query.get(recipe_id)
+	ingredient_edit_form = IngredientEditForm()
+	ingredient_edit_form.ingredients.choices = [(ingredient.ingredient.id, ingredient.ingredient.description) for ingredient in recipe.ingredients]
 	
+	search_form = IngredientSearchForm()
+	
+	ingredient_id = ingredient_edit_form.ingredients.data
+	
+	if ingredient_edit_form.submit_change_amount.data:
+		if ingredient_edit_form.validate_on_submit():
+			ingredient_to_change = Ingredient.query.get(ingredient_id)
+			ingredient_recipe_assoc = IngredientToRecipe.query. \
+						filter_by(recipe_id=recipe_id, ingredient_id=ingredient_id). \
+						first_or_404()
+			ingredient_recipe_assoc.ingredient_amt = float(ingredient_edit_form.new_amount.data)
+			db.session.commit()
+			
+	
+			
+	return render_template('edit_recipe_ingredients.html',
+							form=ingredient_edit_form,
+							recipe=recipe)

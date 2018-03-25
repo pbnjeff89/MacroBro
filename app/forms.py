@@ -1,6 +1,7 @@
+from math import isnan
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
-from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, DecimalField
+from wtforms.validators import DataRequired, ValidationError, Email, EqualTo, Length, Optional
 from app.models import User
 
 class LoginForm(FlaskForm):
@@ -37,8 +38,24 @@ class RecipeForm(FlaskForm):
 	
 	
 class RecipeEditForm(FlaskForm):
-	recipes = SelectField('Recipes', choices=[])
+	recipes = SelectField('Recipes', choices=[], coerce=int, validators=[Optional()])
 	submit_select_recipe = SubmitField('Select Recipe')
-	submit_confirm = SubmitField('Confirm changes')
-	submit_cancel = SubmitField('Cancel changes') 
-	submit_delete = SubmitField('Delete recipe')
+	submit_delete_recipe = SubmitField('Delete Recipe')
+	
+	
+class IngredientEditForm(FlaskForm):
+	ingredients = SelectField('Ingredients', coerce=int, choices=[])
+	new_amount = DecimalField('New amount, in grams', validators=[DataRequired()])
+	submit_change_amount = SubmitField('Change amount')
+	submit_delete_ingredient = SubmitField('Delete this ingredient')
+	
+	
+	def validate_new_amount(self, new_amount):
+		if new_amount.data <= 0.0:
+			raise ValidationError('Only positive numbers!')
+			
+			
+class IngredientSearchForm(FlaskForm):
+	ingredients = SelectField('Ingredients', coerce=int, choices=[])
+	search_query = StringField('I\'m looking for...', validators=[DataRequired()])
+	submit_search = SubmitField('Search for this!')
