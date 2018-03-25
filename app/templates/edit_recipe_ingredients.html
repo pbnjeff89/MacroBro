@@ -2,9 +2,7 @@
 
 {% block content %}
 	<h1>Edit ingredients</h1>
-	<form action="" method="post">
-		{{ form.hidden_tag() }}
-			<h2>Ingredients</h2>
+			<h2>Ingredients Summary</h2>
 			<table>
 				<tr>
 					<th>Ingredient</th>
@@ -23,15 +21,21 @@
 					</tr>
 				{% endfor %}
 			</table>
+	<form action="" method="post">
+		{{ edit_ingredient_form.hidden_tag() }}
+		{{ edit_ingredient_form.submit_add_ingredient () }}
+		<h3>Change an ingredient</h3>
 		<p>
-		{{ form.ingredients }}
-		{{ form.new_amount.label }}
-		{{ form.new_amount }}
-		{{ form.submit_change_amount() }}
-		{{ form.submit_delete_ingredient() }}
+		{{ edit_ingredient_form.ingredients }}
 		</p>
 		<p>
-		{% for error in form.new_amount.errors %}
+		{{ edit_ingredient_form.new_amount.label }}
+		{{ edit_ingredient_form.new_amount }}
+		{{ edit_ingredient_form.submit_change_amount() }}
+		{{ edit_ingredient_form.submit_delete_ingredient() }}
+		</p>
+		<p>
+		{% for error in edit_ingredient_form.new_amount.errors %}
 			<span style="color: red;">[{{ error }}]</span>
 		{% endfor %}
 		</p>

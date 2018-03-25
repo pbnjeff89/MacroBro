@@ -1,9 +1,10 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, RecipeForm, RecipeEditForm, IngredientEditForm, IngredientSearchForm
+from app.forms import LoginForm, RegistrationForm, RecipeForm, RecipeEditForm, IngredientEditForm, IngredientSearchForm, IngredientSearchResultsForm, AddIngredientForm
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Recipe, Ingredient, IngredientToRecipe
 from werkzeug.urls import url_parse
+from difflib import get_close_matches
 
 @app.route('/')
 @app.route('/index')
@@ -111,10 +112,14 @@ def edit_recipe():
 @login_required
 def edit_recipe_ingredients(recipe_id):
 	recipe = Recipe.query.get(recipe_id)
+	
+	if current_user.id is not recipe.user_id:
+		flash('You are not allowed to change this recipe!!!')
+		return redirect(url_for('index'))
+		
+	
 	ingredient_edit_form = IngredientEditForm()
 	ingredient_edit_form.ingredients.choices = [(ingredient.ingredient.id, ingredient.ingredient.description) for ingredient in recipe.ingredients]
-	
-	search_form = IngredientSearchForm()
 	
 	ingredient_id = ingredient_edit_form.ingredients.data
 	
@@ -126,9 +131,42 @@ def edit_recipe_ingredients(recipe_id):
 						first_or_404()
 			ingredient_recipe_assoc.ingredient_amt = float(ingredient_edit_form.new_amount.data)
 			db.session.commit()
-			
 	
+	if ingredient_edit_form.submit_add_ingredient.data:
+		return redirect(url_for('add_ingredient', recipe_id=recipe_id))
 			
 	return render_template('edit_recipe_ingredients.html',
-							form=ingredient_edit_form,
+							edit_ingredient_form=ingredient_edit_form,
 							recipe=recipe)
+							
+							
+@app.route('/add_ingredient/<recipe_id>', methods=['GET','POST'])
+@login_required
+def add_ingredient(recipe_id):
+	search_form = IngredientSearchForm()
+	
+	if search_form.validate_on_submit():
+		query = search_form.search_query.data
+		return redirect(url_for('query_results', recipe_id=recipe_id, query=query))
+
+	return render_template('add_ingredient.html', search_form=search_form)
+											
+
+@app.route('/query_results', methods=['GET','POST'])
+@login_required
+def query_results():
+	results_form = IngredientSearchResultsForm()
+	
+	recipe_id = int(request.args["recipe_id"])
+	query = str(request.args["query"])
+	
+	ingredient_dict = {ingredient.description: ingredient.id for ingredient in Ingredient.query.all()}
+	ingredient_names = list(ingredient_dict.keys())
+	best_matches = get_close_matches(word=query, possibilities=ingredient_names,
+												n=30, cutoff=0.2)
+	ingredient_choices = [(ingredient_dict[best_match], best_match)for best_match in best_matches]
+	results_form.possible_ingredients.choices = ingredient_choices
+	
+	# write redirect
+	
+	return render_template('query_results.html', results_form=results_form)

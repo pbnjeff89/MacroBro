@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	<h1>Add an ingredient</h1>
+	
+	<form action="" method="post">
+		{{ search_form.hidden_tag() }}
+		<h3>Find an ingredient</h3>
+		<p>
+		{{ search_form.search_query }}
+		{{ search_form.submit_search() }}
+		</p>
+	</form>
+
+{% endblock %}

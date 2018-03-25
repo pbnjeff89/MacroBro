@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	<h1>Query results</h1>
+
+	<form action="" methods="post">
+		{{ results_form.hidden_tag() }}
+		<p>
+			{{ results_form.possible_ingredients }}
+			{{ results_form.submit_choose () }}
+		</p>
+	</form>
+
+{% endblock %}
