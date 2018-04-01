@@ -30,6 +30,18 @@ class IngredientToRecipe(db.Model):
 	recipe = db.relationship('Recipe', back_populates='ingredients')
 	ingredient = db.relationship('Ingredient', back_populates='recipes')
 	
+	
+	def get_protein_scaled(self):
+		return round(self.ingredient.protein * self.ingredient_amt / 100, 2)
+		
+		
+	def get_fat_scaled(self):
+		return round(self.ingredient.fat * self.ingredient_amt / 100, 2)
+		
+		
+	def get_carbohydrates_scaled(self):
+		return round(self.ingredient.carbohydrates * self.ingredient_amt / 100, 2)
+	
 		
 class Recipe(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
@@ -38,7 +50,7 @@ class Recipe(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 	ingredients = db.relationship('IngredientToRecipe', back_populates='recipe')
 	
-	
+
 	def get_macro_totals(self):
 		protein_total = fat_total = carbohydrates_total = 0
 		
@@ -49,7 +61,7 @@ class Recipe(db.Model):
 			fat_total += the_ingredient.fat * scaling_factor
 			carbohydrates_total += the_ingredient.carbohydrates * scaling_factor
 		
-		return (protein_total, fat_total, carbohydrates_total)
+		return (round(protein_total, 2), round(fat_total, 2), round(carbohydrates_total, 2))
 	
 	
 	def __repr__(self):

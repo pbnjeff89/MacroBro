@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1>Edit ingredients</h1>
+			<h2>Ingredients Summary</h2>
+			<table>
+				<tr>
+					<th>Ingredient</th>
+					<th>Amount in Recipe (g)</th>
+					<th>Protein (g)</th>
+					<th>Fat (g)</th>
+					<th>Carbohydrates (g)</th>
+				</tr>
+				{% for ingredient in recipe.ingredients %}
+					<tr>
+						<td>{{ ingredient.ingredient.description }}</td>
+						<td>{{ ingredient.ingredient_amt }}</td>
+						<td>{{ ingredient.get_protein_scaled() }}</td>
+						<td>{{ ingredient.get_fat_scaled() }}</td>
+						<td>{{ ingredient.get_carbohydrates_scaled() }}</td>
+					</tr>
+				{% endfor %}
+				<tr>
+					<td><p style="color:white;"> </p></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Total</td>
+					<td></td>
+					<td>{{ recipe.get_macro_totals()[0] }}</td>
+					<td>{{ recipe.get_macro_totals()[1] }}</td>
+					<td>{{ recipe.get_macro_totals()[2] }}</td>
+				</tr>
+			</table>
+	<form action="" method="post">
+		{{ edit_ingredient_form.hidden_tag() }}
+		{{ edit_ingredient_form.submit_add_ingredient () }}
+		<h3>Change an ingredient</h3>
+		<p>
+		{{ edit_ingredient_form.ingredients }}
+		</p>
+		<p>
+		{{ edit_ingredient_form.new_amount.label }}
+		{{ edit_ingredient_form.new_amount }}
+		{{ edit_ingredient_form.submit_change_amount() }}
+		{{ edit_ingredient_form.submit_delete_ingredient() }}
+		</p>
+		<p>
+		{% for error in edit_ingredient_form.new_amount.errors %}
+			<span style="color: red;">[{{ error }}]</span>
+		{% endfor %}
+		</p>
+	</form>
+{% endblock %}

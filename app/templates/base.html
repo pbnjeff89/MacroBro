@@ -1,15 +1,18 @@
 <html>
 	<head>
 		<title>MacroBro</title>
+		<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}"/>
 	</head>
 	<body>
 		<div>
-			MacroBro:
+			Navigation:
 			<a href="{{ url_for('index') }}">Home</a>
 			{% if current_user.is_anonymous %}
 			<a href="{{ url_for('login') }}">Login</a>
 			{% else %}
 			<a href="{{ url_for('user', username=current_user.username) }}">Profile</a>
+			<a href="{{ url_for('new_recipe') }}">Add Recipe</a>
+			<a href="{{ url_for('edit_recipe') }}">Edit Recipe</a>
 			<a href="{{ url_for('logout') }}">Logout</a>
 			{% endif %}
 		</div>
@@ -21,6 +24,7 @@
 			<li>{{ message }}</li>
 			{% endfor %}
 		</ul>
+		<hr>
 		{% endif %}
 		{% endwith %}
 		{% block content %}
