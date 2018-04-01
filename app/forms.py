@@ -62,7 +62,7 @@ class IngredientSearchForm(FlaskForm):
 
 	
 class IngredientSearchResultsForm(FlaskForm):
-	possible_ingredients = SelectField('Query results', coerce=int, choices=[], validators=[DataRequired()])
+	possible_ingredients = SelectField('Query results', coerce=int, choices=[])
 	submit_choose = SubmitField('Choose this ingredient')
 	
 	
@@ -71,6 +71,6 @@ class AddIngredientForm(FlaskForm):
 	submit_add_ingredient = SubmitField('Add this ingredient')
 
 	
-	def validate_ingredient_amt(self, new_amount):
-		if new_amount.data <= 0.0:
+	def validate_ingredient_amt(self, ingredient_amt):
+		if ingredient_amt.data <= 0.0:
 			raise ValidationError('Only positive numbers!')

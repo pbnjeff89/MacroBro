@@ -20,6 +20,20 @@
 						<td>{{ ingredient.get_carbohydrates_scaled() }}</td>
 					</tr>
 				{% endfor %}
+				<tr>
+					<td><p style="color:white;"> </p></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Total</td>
+					<td></td>
+					<td>{{ recipe.get_macro_totals()[0] }}</td>
+					<td>{{ recipe.get_macro_totals()[1] }}</td>
+					<td>{{ recipe.get_macro_totals()[2] }}</td>
+				</tr>
 			</table>
 	<form action="" method="post">
 		{{ edit_ingredient_form.hidden_tag() }}

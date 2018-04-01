@@ -32,15 +32,15 @@ class IngredientToRecipe(db.Model):
 	
 	
 	def get_protein_scaled(self):
-		return self.ingredient.protein * self.ingredient_amt / 100
+		return round(self.ingredient.protein * self.ingredient_amt / 100, 2)
 		
 		
 	def get_fat_scaled(self):
-		return self.ingredient.fat * self.ingredient_amt / 100
+		return round(self.ingredient.fat * self.ingredient_amt / 100, 2)
 		
 		
 	def get_carbohydrates_scaled(self):
-		return self.ingredient.carbohydrates * self.ingredient_amt / 100
+		return round(self.ingredient.carbohydrates * self.ingredient_amt / 100, 2)
 	
 		
 class Recipe(db.Model):
@@ -61,7 +61,7 @@ class Recipe(db.Model):
 			fat_total += the_ingredient.fat * scaling_factor
 			carbohydrates_total += the_ingredient.carbohydrates * scaling_factor
 		
-		return (protein_total, fat_total, carbohydrates_total)
+		return (round(protein_total, 2), round(fat_total, 2), round(carbohydrates_total, 2))
 	
 	
 	def __repr__(self):

@@ -102,8 +102,14 @@ def edit_recipe():
 											recipe_id=recipe_id))
 		if recipe_edit_form.submit_delete_recipe.data:
 			selected_recipe = Recipe.query.get(recipe_id)
+			
+			for ingredient_assoc in selected_recipe.ingredients:
+				db.session.delete(ingredient_assoc)
+
 			db.session.delete(selected_recipe)
 			db.session.commit()
+
+			return redirect(url_for('edit_recipe'))
 
 	return render_template('edit_recipe.html',
 						form=recipe_edit_form)
@@ -134,6 +140,14 @@ def edit_recipe_ingredients(recipe_id):
 	
 	if ingredient_edit_form.submit_add_ingredient.data:
 		return redirect(url_for('add_ingredient', recipe_id=recipe_id))
+
+	if ingredient_edit_form.submit_delete_ingredient.data:
+		ingredient_id = ingredient_edit_form.ingredients.data
+		ingredient_to_delete = Ingredient.query.get(ingredient_id)
+		recipe_ingredient_assoc = IngredientToRecipe.query.filter_by(recipe_id=recipe_id, ingredient_id=ingredient_id).first_or_404()
+		db.session.delete(recipe_ingredient_assoc)
+		db.session.commit()
+		return redirect(url_for('edit_recipe_ingredients', recipe_id=recipe_id))
 			
 	return render_template('edit_recipe_ingredients.html',
 							edit_ingredient_form=ingredient_edit_form,
@@ -157,16 +171,44 @@ def add_ingredient(recipe_id):
 def query_results():
 	results_form = IngredientSearchResultsForm()
 	
-	recipe_id = int(request.args["recipe_id"])
 	query = str(request.args["query"])
+	recipe_id = int(request.args["recipe_id"])
 	
 	ingredient_dict = {ingredient.description: ingredient.id for ingredient in Ingredient.query.all()}
 	ingredient_names = list(ingredient_dict.keys())
-	best_matches = get_close_matches(word=query, possibilities=ingredient_names,
+	best_matches = get_close_matches(word=query.upper(), possibilities=ingredient_names,
 												n=30, cutoff=0.2)
 	ingredient_choices = [(ingredient_dict[best_match], best_match)for best_match in best_matches]
 	results_form.possible_ingredients.choices = ingredient_choices
 	
-	# write redirect
+	if results_form.validate_on_submit():
+		if results_form.possible_ingredients.data:
+			return redirect(url_for('add_ingredient_to_recipe', recipe_id=recipe_id, ingredient_id=results_form.possible_ingredients.data))
+		else:
+			print('nope')
 	
 	return render_template('query_results.html', results_form=results_form)
+	
+	
+@app.route('/add_ingredient_to_recipe', methods=['GET','POST'])
+@login_required
+def add_ingredient_to_recipe():
+	recipe_id = int(request.args["recipe_id"])
+	ingredient_id = int(request.args["ingredient_id"])
+	add_ingredient_form = AddIngredientForm()
+	
+	ingredient = Ingredient.query.get(ingredient_id)
+	
+	if add_ingredient_form.validate_on_submit():
+		recipe = Recipe.query.get(recipe_id)
+		ingredient_recipe_assoc = IngredientToRecipe(ingredient_amt=float(add_ingredient_form.ingredient_amt.data))
+		ingredient_recipe_assoc.recipe_id = recipe_id
+		ingredient_recipe_assoc.ingredient_id = ingredient_id
+		db.session.add(ingredient_recipe_assoc)
+		db.session.commit()
+		return redirect(url_for('edit_recipe'))
+		
+	
+	return render_template('add_ingredient_to_recipe.html',
+								add_ingredient_form=add_ingredient_form,
+								ingredient=ingredient)
